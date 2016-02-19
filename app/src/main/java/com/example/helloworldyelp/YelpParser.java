@@ -51,14 +51,15 @@ public class YelpParser {
         JSONArray businesses = o1.getJSONArray("businesses");
         String tmpString;
         for (int i = 0; businesses.length() > i; i++){
-            tmpString = businesses.getJSONObject(i).get("mobile_url").toString() + " ,,, " +
-                    businesses.getJSONObject(i).get("rating_img_url").toString() + " ,,,, " +
-                    businesses.getJSONObject(i).get("rating").toString();
+            tmpString = "yMobileUrl" + businesses.getJSONObject(i).get("mobile_url").toString() + "yRating" +
+                    businesses.getJSONObject(i).get("rating").toString() + "yLocation" +
+                    businesses.getJSONObject(i).get("location").toString() + "yImageUrl" +
+                    businesses.getJSONObject(i).get("image_url").toString();
             keys.add(businesses.getJSONObject(i).get("name").toString());
-            //yelp_bundle.putString(keys.get(i), tmpString);
             yelp_bundle.put(keys.get(i), tmpString);
         }
     }
+
 
     /**
      * Gets the business name, assuming you supply the bundle, key, and int
@@ -89,8 +90,9 @@ public class YelpParser {
     public String getBusinessMobileURL(HashMap<String, String> myBundle, ArrayList<String> myKey, int i){
         //String tmp = myBundle.getString(myKey.get(i));
         String tmp = myBundle.get(myKey.get(i));
-        int x = tmp.indexOf(" ,,, ");
-        String mobileURL = tmp.substring(0, x);
+        int x = tmp.indexOf("yMobileUrl") + 10;
+        int y = tmp.indexOf("yRating");
+        String mobileURL = tmp.substring(x, y);
         return mobileURL;
     }
 
@@ -104,45 +106,61 @@ public class YelpParser {
     public String getBusinessMobileURL(int i){
         //String tmp = yelp_bundle.getString(keys.get(i));
         String tmp = yelp_bundle.get(keys.get(i));
-        int x = tmp.indexOf(" ,,, ");
-        String mobileURL = tmp.substring(0, x);
+        int x = tmp.indexOf("yMobileUrl") + 10;
+        int y = tmp.indexOf("yRating");
+        String mobileURL = tmp.substring(x, y);
         return mobileURL;
     }
 
     public String getBusinessRating(int i){
         String tmp = yelp_bundle.get(keys.get(i));
-        int x = tmp.indexOf(" ,,,, ") + 6;
-        String rating = tmp.substring(x, tmp.length());
+        int x = tmp.indexOf("yRating") + 7;
+        int y = tmp.indexOf("yLocation");
+        String rating = tmp.substring(x, y);
         return rating;
     }
 
-    /**
-     * This will return the rating URL from the user-supplied Bundle, key, and int i
-     * @param myBundle
-     * @param myKey
-     * @param i
-     * @return ratingURL
-     */
-    public String getRatingURL (HashMap<String, String> myBundle, ArrayList<String> myKey, int i){
-        //String tmp = myBundle.getString(myKey.get(i));
-        String tmp = myBundle.get(myKey.get(i));
-        int x = tmp.indexOf(" ,,, ") + 5;
-        String ratingURL = tmp.substring(x);
-        return ratingURL;
+    public String getBusinessAddress(int i){
+        String tmp, tmp2, address;
+        int x, y;
+        //Get the location information
+        tmp = yelp_bundle.get(keys.get(i));
+        x = tmp.indexOf("yLocation") + 9;
+        y = tmp.indexOf("yImageUrl");
+        tmp = tmp.substring(x, y);
+
+        //Get the address
+        x = tmp.indexOf("address") + 11;
+        tmp2 = tmp.substring(x, tmp.length());
+        y = tmp2.indexOf("\"],");
+        address = tmp2.substring(0, y) + ", ";
+
+        //Get the city
+        x = tmp.indexOf("city") + 7;
+        tmp2 = tmp.substring(x, tmp.length());
+        y = tmp2.indexOf("\",");
+        address = address + tmp2.substring(0, y) + ", ";
+
+        //Get the state code
+        x = tmp.indexOf("state_code") + 13;
+        tmp2 = tmp.substring(x, tmp.length());
+        y = tmp2.indexOf("\"");
+        address = address + tmp2.substring(0, y) + " ";
+
+        //Get the postal code
+        x = tmp.indexOf("postal_code") + 14;
+        tmp2 = tmp.substring(x, tmp.length());
+        y = tmp2.indexOf("\",");
+        address = address + tmp2.substring(0, y);
+
+        return address;
     }
 
-    /**
-     * This will return the rating URL using this class's internal variables.
-     * I recommend using this method. Int i is for keys.get(i).
-     * @param i
-     * @return ratingURL
-     */
-    public String getRatingURL (int i){
-        //String tmp = yelp_bundle.getString(keys.get(i));
+    public String getBusinessImageURL(int i){
         String tmp = yelp_bundle.get(keys.get(i));
-        int x = tmp.indexOf(" ,,, ") + 5;
-        String ratingURL = tmp.substring(x);
-        return ratingURL;
+        int x = tmp.indexOf("yImageUrl") + 9;
+        String imgUrl = tmp.substring(x, tmp.length());
+        return imgUrl;
     }
 
     /**

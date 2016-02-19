@@ -1,5 +1,7 @@
 package com.example.helloworldyelp;
 
+import android.graphics.BitmapFactory;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
@@ -7,6 +9,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.content.Intent;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.text.Html;
 
@@ -51,8 +54,10 @@ public class MainActivity extends AppCompatActivity {
 
                 final TextView tv = (TextView) findViewById(R.id.textView2);
                 Button generator = (Button) findViewById(R.id.button);
-                String htmlexample = "<body><h2>The Result<br></h2>";
-                tv.setText(Html.fromHtml(htmlexample, null, null));
+                final ImageView  iv  = (ImageView) findViewById(R.id.imageView);
+
+                //String htmlexample = "<body><h2>The Result<br></h2>";
+                //tv.setText(Html.fromHtml(htmlexample, null, null));
                 generator.setOnClickListener(new View.OnClickListener() {
                     public void onClick(View v) {
                         //System.out.println("Within the Thread");
@@ -60,23 +65,31 @@ public class MainActivity extends AppCompatActivity {
                     public void run(){
                         try {
 
-                            int RandResturant =  ran.nextInt(10  - 2) + 1;
-                            Long tsLong = System.currentTimeMillis()/1000;
-                            String ts = tsLong.toString();
-                            System.out.println(ts);
+                            int RandResturant =  ran.nextInt(5);
                             Yelp yelp = new Yelp(consumerKey, consumerSecret, token, tokenSecret);
                             String response = yelp.search("burritos", 30.361471, -87.164326);
-                            System.out.println(response);
+                            //System.out.println(response);
 
                             //System.out.println("Result:" + response);
-//                            YelpParser yp = new YelpParser();
-//                            yp.setResponse(response);
-//                            yp.parseBusiness();
-//                            String activity = yp.getBusinessName(RandResturant);
-//                            System.out.print(activity);
-//                            String htmlexample = "<body><h2>The Result<br></h2><p>"+activity+"<p>";
-//
-//                            tv.setText(Html.fromHtml(htmlexample, null, null));
+                            YelpParser yp = new YelpParser();
+                            yp.setResponse(response);
+                            yp.parseBusiness();
+                            System.out.print(RandResturant);
+                            String activity = yp.getBusinessName(RandResturant);
+                            System.out.print(RandResturant);
+                            String img_url = yp.getBusinessImageURL(RandResturant);
+
+                            System.out.print(activity);
+                            String htmlexample = "<body><h2>The Result<br></h2><p>"+activity+"<p><br> ";
+                            URL newurl = new URL(img_url);
+                            Bitmap mIcon_val = BitmapFactory.decodeStream(newurl.openConnection().getInputStream());
+
+
+
+                            iv.setImageBitmap(mIcon_val);
+                            tv.setText(activity);
+
+
                               } catch (Exception e) {
 
                                   System.out.println("\n\n\nError:"+e.getMessage());
