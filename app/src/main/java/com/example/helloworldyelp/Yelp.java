@@ -11,7 +11,7 @@ import org.scribe.model.Response;
 import org.scribe.model.Token;
 import org.scribe.model.Verb;
 import org.scribe.oauth.OAuthService;
-
+//
 /**
  * Example for accessing the Yelp API.
  */
