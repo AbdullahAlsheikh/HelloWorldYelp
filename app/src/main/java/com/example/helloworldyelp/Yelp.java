@@ -19,6 +19,7 @@ public class Yelp {
 
     OAuthService service;
     Token accessToken;
+    int limit = 5;
 
     /**
      * Setup the Yelp API OAuth credentials.
@@ -35,6 +36,10 @@ public class Yelp {
         this.accessToken = new Token(token, tokenSecret);
     }
 
+    public void setLimit(int limitPar){
+        limit = limitPar;
+    }
+
     /**
      * Search with term and location.
      *
@@ -47,6 +52,19 @@ public class Yelp {
         OAuthRequest request = new OAuthRequest(Verb.GET, "http://api.yelp.com/v2/search");
         request.addQuerystringParameter("term", term);
         request.addQuerystringParameter("ll", latitude + "," + longitude);
+        request.addQuerystringParameter("limit", String.valueOf(limit));
+        this.service.signRequest(this.accessToken, request);
+        request.setConnectionKeepAlive(false);
+        Response response = request.send();
+
+        return response.getBody();
+    }
+
+    public String searchByLocation(String term, String address){
+        OAuthRequest request = new OAuthRequest(Verb.GET, "http://api.yelp.com/v2/search");
+        request.addQuerystringParameter("term", term);
+        request.addQuerystringParameter("location", address);
+        request.addQuerystringParameter("limit", String.valueOf(limit));
         this.service.signRequest(this.accessToken, request);
         request.setConnectionKeepAlive(false);
         Response response = request.send();
